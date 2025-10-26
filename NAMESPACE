@@ -3,3 +3,7 @@
 S3method(print,IPWM)
 S3method(summary,IPWM)
 export(IPWM)
+export(PRECALI)
+importFrom(survey,calibrate)
+importFrom(survey,svydesign)
+importFrom(survey,svytotal)
