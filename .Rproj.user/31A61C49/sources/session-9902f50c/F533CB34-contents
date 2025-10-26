@@ -1,0 +1,39 @@
+library(devtools)    
+library(usethis)
+library(roxygen2)
+unlink("NAMESPACE")  # delete NAMESPACE as roxygen2 will generate new one
+
+### import and describe data
+library(here)
+sampleC= read.csv(here("data", "sampleC.csv"))
+usethis::use_data(sampleC)   # .rda file in data
+
+sampleP = read.csv(here("data", "SampleP1.csv"))
+usethis::use_data(sampleP)  # .rda file in data
+# usethis::use_r("sampleC")   # create .R for description
+# usethis::use_r("sampleP")  # create .R for description
+devtools::document()
+
+### sc and sp with categorical age group
+sampleC_cate = read.csv(here("data", "sampleC_cate.csv"))  
+sampleC_cate$age_level = as.factor(sampleC_cate$age_level); class(sampleC_cate$age_level)
+sampleP_cate = read.csv(here("data", "sampleP1_cate.csv"))
+sampleP_cate$age_level = as.factor(sampleP_cate$age_level); class(sampleP_cate$age_level)
+
+
+### import function script and document
+usethis::use_r("expit")  # create expit.R in 'R' file
+usethis::use_r("check_input")
+usethis::use_r("ALP_simulated")
+usethis::use_r("CLW_simulated")
+usethis::use_r("Raking_simulated")
+usethis::use_r("IPWM_one_reference")
+
+usethis::use_r("IPWM")
+devtools::document()     # generate Rd file (the help document for user)
+
+?alp_simulated_deviates_scale                   # based on generated Rd file in the last step
+
+# check if the package name is unique
+library(available)
+available("ref", browse = FALSE)
