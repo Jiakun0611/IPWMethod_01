@@ -1,13 +1,14 @@
-print.IPWM <- function(obj, ...) {
-  cat("Call:\n")
-  print(obj$call)
-
-  cat("\nEstimators:\n")
-  cat(obj$method, "mean:", obj$mean, "\n")
-  cat(obj$method, "variance:", obj$variance, "\n")
-}
-
-
+#' Summary method for IPWM objects
+#'
+#' Provides detailed output for objects of class \code{"IPWM"},
+#' including model information, estimators, and selection model coefficients.
+#'
+#' @param object An object of class \code{"IPWM"}, typically the output of \code{\link{IPWM}}.
+#' @param ... Additional arguments (not used).
+#'
+#' @method summary IPWM
+#' @export
+#'
 summary.IPWM <- function(object, ...) {
 
   # --- One-reference case ---
@@ -39,14 +40,12 @@ summary.IPWM <- function(object, ...) {
     print(as.data.frame(formatted_df), row.names = FALSE)
   }
 
-
   # --- Multi-reference case ---
   else if (object$method == "multi") {
     cat("Call:\n")
     print(object$call)
     cat("\nMethod: Multi Reference\n\n")
 
-    # --- Print verbose logs if available ---
     if (!is.null(object$log) && length(object$log) > 0) {
       cat(paste0(object$log, collapse = ""))
       cat("\n")
@@ -60,7 +59,6 @@ summary.IPWM <- function(object, ...) {
     cat(object$method, "variance:", object$variance, "\n")
     cat("(Newton-Raphson iterations:", object$iterations, ")\n\n")
 
-    # --- Coefficients ---
     if (!is.null(object$coefficients)) {
       cat("Selection model coefficients:\n\n")
       names  <- object$variables
