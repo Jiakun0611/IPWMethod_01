@@ -16,3 +16,8 @@ library(IPWMethod)
 # for others to use
 install.packages("devtools")
 devtools::install_github("Jiakun0611/IPWMethod")
+
+
+remove.packages("IPWMethod")
+
+devtools::install(force = TRUE)
