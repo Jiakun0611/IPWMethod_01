@@ -13,5 +13,6 @@
 }
 \description{
 Provides detailed output for objects of class \code{"IPWM"},
-including model information, estimators, and selection model coefficients.
+including model information, estimators, confidence intervals,
+and selection model coefficients.
 }

@@ -15,8 +15,14 @@ print.IPWM <- function(obj, ...) {
   print(obj$call)
 
   cat("\nEstimators:\n")
-  cat(obj$method, "mean:", obj$mean, "\n")
-  cat(obj$method, "variance:", obj$variance, "\n")
+  cat(obj$method, "mean:     ", round(obj$mean_adjusted, 6), "\n")
+  cat(obj$method, "variance: ", round(obj$var_adjusted, 6), "\n")
+  cat(obj$method, "95% CI:   [",
+      round(obj$CI_95_adjusted[1], 6), ", ",
+      round(obj$CI_95_adjusted[2], 6), "]\n")
+
+  invisible(obj)
 }
+
 
 
