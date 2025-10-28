@@ -5,8 +5,11 @@ unlink("NAMESPACE")  # delete NAMESPACE as roxygen2 will generate new one
 
 usethis::use_r("IPWM")
 devtools::document()
+devtools::install(".", force = TRUE)
+library(IPWMethod)
+?IPWM
 
-build()      # Builds .tar.gz
+# build()      # Builds .tar.gz
 install()    # Installs locally
 load_all()   # Loads your package into current R session
 
@@ -20,4 +23,3 @@ devtools::install_github("Jiakun0611/IPWMethod")
 
 remove.packages("IPWMethod")
 
-devtools::install(force = TRUE)

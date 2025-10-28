@@ -29,8 +29,7 @@ representing reference probability sample(s).}
 \item{weight}{Character string (one-reference) or character vector (multi-reference)
 specifying the weight variable(s) in \code{sp}.}
 
-\item{p_formula}{Optional. Either a formula, list of formulas, or character
-vector defining covariates for the participation model(s). If omitted,
+\item{p_formula}{Optional. Either a formula, or a list of formulas. If omitted,
 the method will use main effects of existing variables directly.}
 
 \item{method}{Character string. One of \code{"ALP"}, \code{"CLW"}, \code{"raking"},
@@ -46,7 +45,7 @@ multi-reference case. Default is \code{TRUE}.}
 
 \item{tol}{Numeric. Convergence tolerance for the Newton–Raphson algorithm (default 1e-4).}
 
-\item{verbose}{Logical. If \code{TRUE}, prints intermediate convergence messages.}
+\item{verbose}{Logical. To control output format for S3 object.}
 }
 \value{
 An object of class \code{"IPWM"} containing the following elements:
@@ -58,13 +57,15 @@ An object of class \code{"IPWM"} containing the following elements:
   \item{iterations}{Number of iterations used in estimation.}
   \item{variables}{Covariates included in the participation model.}
 }
+
+The object can be summarized with \code{summary()} to display key results.
 }
 \description{
 A unified function for implementing inverse propensity weighting methods
 to integrate convenience samples with one or multiple reference probability
-samples. Supports three single-reference methods — Adjusted Logistic
-Propensity (ALP), CLW, and Raking — as well as a multi-reference extension that performs iterative raking with optional
-pairwise pre-calibration.
+samples. Supports three single-reference methods - Adjusted Logistic
+Propensity (ALP), CLW, and Raking - as well as a multi-reference extension
+that performs calibration (raking) with optional pairwise pre-calibration.
 }
 \details{
 The function automatically detects whether the user provides one or multiple
@@ -73,9 +74,8 @@ internally set to \code{"multi"}.
 
 The participation model can be specified via:
 \itemize{
-  \item A formula (e.g., \code{~ x1 + x2 + x3*x4}) for one-reference case.
-  \item A list of formulas for multi-reference case.
-  \item A character vector or list of variable names.
+  \item A formula (e.g., \code{~ x1 + x2 + x3*x4}) for the one-reference case.
+  \item A list of formulas for the multi-reference case.
 }
 }
 \examples{
@@ -110,6 +110,5 @@ fit2 <- IPWM(
 
 }
 \seealso{
-\code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}},
-\code{\link{process_p_formula}}
+\code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}}, \code{\link{process_p_formula}}
 }

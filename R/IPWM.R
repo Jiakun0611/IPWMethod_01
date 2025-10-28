@@ -3,9 +3,9 @@
 #' @description
 #' A unified function for implementing inverse propensity weighting methods
 #' to integrate convenience samples with one or multiple reference probability
-#' samples. Supports three single-reference methods — Adjusted Logistic
-#' Propensity (ALP), CLW, and Raking — as well as a multi-reference extension that performs iterative raking with optional
-#' pairwise pre-calibration.
+#' samples. Supports three single-reference methods - Adjusted Logistic
+#' Propensity (ALP), CLW, and Raking - as well as a multi-reference extension
+#' that performs calibration (raking) with optional pairwise pre-calibration.
 #'
 #' @details
 #' The function automatically detects whether the user provides one or multiple
@@ -14,11 +14,9 @@
 #'
 #' The participation model can be specified via:
 #' \itemize{
-#'   \item A formula (e.g., \code{~ x1 + x2 + x3*x4}) for one-reference case.
-#'   \item A list of formulas for multi-reference case.
-#'   \item A character vector or list of variable names.
+#'   \item A formula (e.g., \code{~ x1 + x2 + x3*x4}) for the one-reference case.
+#'   \item A list of formulas for the multi-reference case.
 #' }
-#'
 #'
 #' @param sc Data frame. Convenience sample containing outcome and covariates.
 #' @param sp Data frame (one-reference) or list of data frames (multi-reference)
@@ -26,8 +24,7 @@
 #' @param y Character string. Name of the outcome variable in \code{sc}.
 #' @param weight Character string (one-reference) or character vector (multi-reference)
 #'   specifying the weight variable(s) in \code{sp}.
-#' @param p_formula Optional. Either a formula, list of formulas, or character
-#'   vector defining covariates for the participation model(s). If omitted,
+#' @param p_formula Optional. Either a formula, or a list of formulas. If omitted,
 #'   the method will use main effects of existing variables directly.
 #' @param method Character string. One of \code{"ALP"}, \code{"CLW"}, \code{"raking"},
 #'   or \code{"multi"}. If \code{sp} is a list, method is automatically set to \code{"multi"}.
@@ -37,7 +34,7 @@
 #'   multi-reference case. Default is \code{TRUE}.
 #' @param maxit Integer. Maximum number of Newton–Raphson iterations (default 20).
 #' @param tol Numeric. Convergence tolerance for the Newton–Raphson algorithm (default 1e-4).
-#' @param verbose Logical. If \code{TRUE}, prints intermediate convergence messages.
+#' @param verbose Logical. To control output format for S3 object.
 #'
 #' @return
 #' An object of class \code{"IPWM"} containing the following elements:
@@ -49,6 +46,8 @@
 #'   \item{iterations}{Number of iterations used in estimation.}
 #'   \item{variables}{Covariates included in the participation model.}
 #' }
+#'
+#' The object can be summarized with \code{summary()} to display key results.
 #'
 #' @examples
 #' \dontrun{
@@ -81,10 +80,10 @@
 #' }
 #'
 #' @seealso
-#' \code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}},
-#' \code{\link{process_p_formula}}
+#' \code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}}, \code{\link{process_p_formula}}
 #'
 #' @export
+
 IPWM <- function(
     sc,                          # sc: convenience sample data.frame
     sp,                          # sp: data.frame (One) or list of data.frames (Multi)
