@@ -5,6 +5,7 @@ unlink("NAMESPACE")  # delete NAMESPACE as roxygen2 will generate new one
 
 usethis::use_r("IPWM")
 devtools::document()
+devtools::check()
 devtools::install(".", force = TRUE)
 library(IPWMethod)
 ?IPWM
