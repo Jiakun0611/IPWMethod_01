@@ -75,17 +75,25 @@ IPWM_Multi_Raking <- function(
   result <- list(
     mean_unweighted  = result_naive$mean,
     var_unweighted   = result_naive$var,
+    CI_95_unweighted = c(
+      result_naive$mean - 1.96 * sqrt(result_naive$var),
+      result_naive$mean + 1.96 * sqrt(result_naive$var)
+    ),
     mean_adjusted    = mu,
     var_adjusted     = v,
-    CI_95            = c(mu - 1.96 * sqrt(v), mu + 1.96 * sqrt(v)),
-    weights      = wts.sc[Z == 1],
-    variables    = names(beta),
-    coefficients = beta,
-    iterations   = nr_out$iter,
-    method       = "multi",
-    call         = match.call(),
- #   log          = log_messages
+    CI_95_adjusted   = c(
+      mu - 1.96 * sqrt(v),
+      mu + 1.96 * sqrt(v)
+    ),
+    weights          = wts.sc[Z == 1],
+    variables        = names(beta),
+    coefficients     = beta,
+    iterations       = nr_out$iter,
+    method           = "multi",
+    call             = match.call(),
+    log              = log_messages
   )
+
 
   class(result) <- "IPWM"
   return(result)

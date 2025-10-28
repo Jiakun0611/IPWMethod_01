@@ -30,12 +30,16 @@ IPWM_One <- function(
   result <- list(
     mean_unweighted  = result_naive$mean,
     var_unweighted   = result_naive$var,
+    CI_95_unweighted = c(
+      result_naive$mean - 1.96 * sqrt(result_naive$var),
+      result_naive$mean + 1.96 * sqrt(result_naive$var)
+    ),
     mean_adjusted    = result_IPW[[3]],
     var_adjusted     = result_IPW[[4]],
-    CI_95            = c(
+    CI_95_adjusted   = c(
       result_IPW[[3]] - 1.96 * sqrt(result_IPW[[4]]),
       result_IPW[[3]] + 1.96 * sqrt(result_IPW[[4]])
-    ),   # 0.95 CI
+    ),
     weights          = result_IPW[[1]],
     variables        = result_IPW[[5]],
     coefficients     = result_IPW[[2]],
@@ -43,6 +47,7 @@ IPWM_One <- function(
     method           = method,
     call             = match.call()
   )
+
 
 
   class(result) <- "IPWM"
