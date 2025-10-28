@@ -130,7 +130,7 @@ IPWM <- function(
       p_vars <- processed$vars   # expanded variable names
 
     } else {
-      # Otherwise, assume p_formula is already variable names → skip processing
+      # Otherwise, if p_formula is already variable names, skip processing
       p_vars <- p_formula
     }
   }

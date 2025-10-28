@@ -81,6 +81,9 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula) {
       vars_list[[j]] <- colnames(Xc)
     }
 
+    # --- preserve original sp names ---
+    names(sp_new) <- if (!is.null(names(sp))) names(sp) else paste0("sp", seq_along(sp))
+
     # Finalize
     sc <- sc_new
     if (!is.null(y)) sc[[y]] <- sc_orig[[y]]
