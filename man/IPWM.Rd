@@ -52,10 +52,19 @@ An object of class \code{"IPWM"} containing the following elements:
 \describe{
   \item{call}{Function call used to generate the result.}
   \item{method}{The IPW method applied ("ALP", "CLW", "raking", or "multi").}
-  \item{mean, variance}{Estimated weighted mean and variance of the outcome.}
-  \item{coefficients}{Estimated coefficients of the participation model.}
-  \item{iterations}{Number of iterations used in estimation.}
+
+  \item{mean_unweighted}{Unweighted (raw) mean of the outcome variable.}
+  \item{var_unweighted}{Unweighted variance of the outcome variable.}
+  \item{CI_95_unweighted}{95\% confidence interval for the unweighted mean.}
+
+  \item{mean_adjusted}{Weighted mean estimated using the specified IPW method.}
+  \item{var_adjusted}{Variance estimate for the weighted mean.}
+  \item{CI_95_adjusted}{95\% confidence interval for the weighted mean.}
+
+  \item{weights}{Final calibrated or IPW-adjusted weights assigned to each unit in the convenience sample.}
   \item{variables}{Covariates included in the participation model.}
+  \item{coefficients}{Estimated coefficients from the participation model (logistic regression).}
+  \item{iterations}{Number of iterations used in the estimation procedure.}
 }
 
 The object can be summarized with \code{summary()} to display key results.

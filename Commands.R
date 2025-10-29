@@ -9,15 +9,16 @@ devtools::document()
 devtools::check()
 devtools::install(".", force = TRUE)
 
-rm(IPWM)
 library(IPWMethod)
 ?IPWM
 
 
 
+
+
 build()      # Builds .tar.gz
 install()    # Installs locally
-load_all()   # Loads your package into current R session
+load_all()   # Loads package into current R session
 
 
 # for others to use
