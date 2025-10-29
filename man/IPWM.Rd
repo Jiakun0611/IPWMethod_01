@@ -86,6 +86,14 @@ The participation model can be specified via:
   \item A formula (e.g., \code{~ x1 + x2 + x3*x4}) for the one-reference case.
   \item A list of formulas for the multi-reference case.
 }
+
+For a detailed overview of R formula syntax, open the PDF included in the package:
+
+\preformatted{
+browseURL(system.file("Doc", "formula_cheatsheet.pdf", package = "IPWMethod"))
+}
+
+Simply copy and run this line in R to view the cheatsheet.
 }
 \examples{
 \dontrun{
@@ -117,7 +125,4 @@ fit2 <- IPWM(
 )
 }
 
-}
-\seealso{
-\code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}}, \code{\link{process_p_formula}}
 }

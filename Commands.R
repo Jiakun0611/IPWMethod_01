@@ -28,3 +28,4 @@ devtools::install_github("Jiakun0611/IPWMethod")
 
 remove.packages("IPWMethod")
 
+browseURL(system.file("Doc", "formula_cheatsheet.pdf", package = "IPWMethod"))

@@ -59,6 +59,16 @@
 #'
 #' The object can be summarized with \code{summary()} to display key results.
 #'
+#'
+#' @details
+#' For a detailed overview of R formula syntax, open the PDF included in the package:
+#'
+#' \preformatted{
+#' browseURL(system.file("Doc", "formula_cheatsheet.pdf", package = "IPWMethod"))
+#' }
+#'
+#' Simply copy and run this line in R to view the cheatsheet.
+
 #' @examples
 #' \dontrun{
 #' # --- Example: One-reference case ---
@@ -88,9 +98,6 @@
 #'   cali = TRUE
 #' )
 #' }
-#'
-#' @seealso
-#' \code{\link{IPWM_One}}, \code{\link{IPWM_Multi_Raking}}, \code{\link{process_p_formula}}
 #'
 #' @export
 
