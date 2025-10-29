@@ -117,23 +117,21 @@ IPWM <- function(
 
 
   # --- 0.5) Check and preprocess p_formula ---
-  p_vars <- NULL
 
   if (!is.null(p_formula)) {
-    # If p_formula is a formula (or list of formulas) → preprocess
-    if (inherits(p_formula, "formula") ||
-        (is.list(p_formula) && all(vapply(p_formula, inherits, logical(1), "formula")))) {
 
-      processed <- process_p_formula(sc, sp, weight, y, zcol, p_formula)
-      sc     <- processed$sc
-      sp     <- processed$sp
-      p_vars <- processed$vars   # expanded variable names
-
-    } else {
-      # Otherwise, if p_formula is already variable names, skip processing
-      p_vars <- p_formula
+    # p_formula is restrict to formula type only
+    if (!(inherits(p_formula, "formula") ||
+          (is.list(p_formula) && all(vapply(p_formula, inherits, logical(1), "formula"))))) {
+      stop("'p_formula' must be a formula (for one reference) or a list of formulas (for multiple references).")
     }
-  }
+
+    processed <- process_p_formula(sc, sp, weight, y, zcol, p_formula)
+    sc     <- processed$sc
+    sp     <- processed$sp
+    p_vars <- processed$vars
+
+  } else { p_vars <- p_formula }
 
 
   # --- 1) Run one-reference IPW method ---
