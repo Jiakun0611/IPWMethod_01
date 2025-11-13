@@ -119,6 +119,8 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula,
     log_messages <- character()
 
     if (Pre.calibration && length(sp_new) > 1) {
+
+      # determine reference dataset
       sizes <- sapply(sp, nrow)
       ref_idx <- which.max(sizes)
       ref_name <- names(sp)[ref_idx]
@@ -129,7 +131,12 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula,
       log_messages <- c(log_messages, msg)
       if (verbose) cat(msg)
 
+
+      # ------------------------------------------------------------
+      #     MAIN LOOP: pairwise calibration against largest sample
+      # ------------------------------------------------------------
       for (i in seq_along(sp)) {
+
         if (i == ref_idx) next
 
         # --- find shared variables (exclude weight columns) ---
@@ -137,25 +144,59 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula,
         tar_vars <- setdiff(names(sp[[i]]),        weight[[i]])
         shared   <- intersect(ref_vars, tar_vars)
 
-        # --- use shared variables directly (no fallback dummy) ---
+        # --- extract shared variables ---
         ref_use <- if (length(shared) > 0) sp[[ref_idx]][, shared, drop = FALSE] else sp[[ref_idx]][, 0, drop = FALSE]
-        tar_use <- if (length(shared) > 0) sp[[i]][, shared, drop = FALSE] else sp[[i]][, 0, drop = FALSE]
+        tar_use <- if (length(shared) > 0) sp[[i]][,        shared, drop = FALSE] else sp[[i]][, 0, drop = FALSE]
 
-        # --- temporary frames for PRECALI ---
+
+        # ------------------------------------------------------------
+        #   ** CRITICAL FIX **
+        #   ensure shared variables are FACTORS and unify levels
+        # ------------------------------------------------------------
+        for (v in shared) {
+
+          # convert to factor if not factor
+          if (!is.factor(ref_use[[v]]))
+            ref_use[[v]] <- factor(ref_use[[v]])
+
+          if (!is.factor(tar_use[[v]]))
+            tar_use[[v]] <- factor(tar_use[[v]])
+
+          # unify levels between reference and target
+          lv <- union(levels(ref_use[[v]]), levels(tar_use[[v]]))
+
+          ref_use[[v]] <- factor(ref_use[[v]], levels = lv)
+          tar_use[[v]] <- factor(tar_use[[v]], levels = lv)
+        }
+
+
+        # ------------------------------------------------------------
+        #   temporary frames for PRECALI
+        # ------------------------------------------------------------
         ref_tmp <- cbind(ref_use, w = sp[[ref_idx]][[weight[[ref_idx]]]])
         tar_tmp <- cbind(tar_use, w = sp[[i]][[weight[[i]]]])
 
-        # --- run PRECALI ---
+        # enforce numeric weight
+        ref_tmp$w <- as.numeric(ref_tmp$w)
+        tar_tmp$w <- as.numeric(tar_tmp$w)
+
+
+        # ------------------------------------------------------------
+        #   run PRECALI safely
+        # ------------------------------------------------------------
         new_w <- PRECALI(
           wts      = c("w", "w"),
           refs     = list(ref_tmp, tar_tmp),
           dup_vars = shared
         )
 
-        # --- update target weights ---
+        # update weights
         sp_new[[i]][[ weight[[i]] ]] <- new_w
 
-        # --- logging ---
+
+        # ------------------------------------------------------------
+        #   logging
+        # ------------------------------------------------------------
         if (length(shared) > 0) {
           msg <- sprintf(
             "Pre-calibration for %s done on: %s and survey weights total\n",
@@ -164,7 +205,7 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula,
           )
         } else {
           msg <- sprintf(
-            "Pre-calibration for weights in %s done on survey weights total (no shared variables)\n",
+            "Pre-calibration for %s done on weights only (no shared variables)\n",
             names(sp)[i] %||% paste0("sp", i)
           )
         }
@@ -173,11 +214,14 @@ process_p_formula <- function(sc, sp, weight, y, zcol, p_formula,
         if (verbose) cat(msg)
       }
 
+
     } else {
+
       msg <- "Pre-calibration is recommended.\n"
       log_messages <- c(log_messages, msg)
       if (verbose) cat(msg)
     }
+
 
 
     # ======================================================================
