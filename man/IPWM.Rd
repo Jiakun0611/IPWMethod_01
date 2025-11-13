@@ -14,7 +14,7 @@ IPWM(
   zcol = NULL,
   cali = TRUE,
   maxit = 20,
-  tol = 1e-04,
+  tol = 0.0001,
   verbose = FALSE
 )
 }

@@ -1,4 +1,16 @@
-.Rproj.user
+# RStudio files
+.Rproj.user/
 .Rhistory
 .RData
-.Ruserdata
+*.Rproj
+
+# macOS files
+.DS_Store
+
+# compiled objects
+*.o
+*.so
+*.dll
+
+# pkgdown
+docs/

@@ -6,9 +6,11 @@ IPWM_One <- function(
     weight,                      # weight: weight column name in sp
     method,                      # one of "ALP","CLW","raking"
     zcol = NULL,                 # domain variable for subset
-    maxit = 20, tol = 1e-4) {    # NR control
+    maxit = 20, tol = 1e-4,      # NR control
+    verbose = FALSE,
+    log_messages) {
 
-  validated <- check_input(sc=sc, sp=sp, y=y, vars=vars, wts.col = weight, method = method, zcol = zcol)
+  validated <- check_input_one(sc=sc, sp=sp, y=y, vars=vars, wts.col = weight, zcol = zcol)
   sc   <- validated$sc
   sp   <- validated$sp
   y    <- validated$y
@@ -45,7 +47,8 @@ IPWM_One <- function(
     coefficients     = result_IPW[[2]],
     iterations       = result_IPW[[6]],
     method           = method,
-    call             = match.call()
+    call             = match.call(),
+    log_messages     = log_messages
   )
 
 

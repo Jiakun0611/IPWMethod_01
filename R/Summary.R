@@ -14,38 +14,47 @@ summary.IPWM <- function(object, ...) {
 
   cat("Call:\n")
   print(object$call)
-  cat("\nMethod:", object$method, "\n\n")
+
+  if (object$method %in% c("ALP", "CLW", "raking")) {
+    cat("\nMethod: One reference", object$method, "\n")
+  } else if (object$method == "multi") {
+    cat("\nMethod: Multi reference raking\n")
+  }
 
   # --- Optional log output (for multi-reference runs) ---
-  if (!is.null(object$log) && length(object$log) > 0) {
-    cat(paste0(object$log, collapse = ""))
-    cat("\n")
+  if (!is.null(object$log_messages) && length(object$log_messages) > 0) {
+    cat(paste0(object$log_messages, collapse = ""))
   }
 
   # --- Model information ---
   if (!is.null(object$variables)) {
-    cat("Participation model involves the following variables:\n")
+    cat("\nParticipation model involves the following variables:\n")
     cat(object$variables[-1], "\n\n")
   }
 
   # --- Estimators section ---
-  cat("Estimators:\n\n")
-  cat("Unweighted mean:     ", round(object$mean_unweighted, 6), "\n")
-  cat("Unweighted variance: ", round(object$var_unweighted, 6), "\n")
-  cat("95% CI (unweighted): [",
-      round(object$CI_95_unweighted[1], 6), ", ",
-      round(object$CI_95_unweighted[2], 6), "]\n\n")
+  cat("Estimators summary:\n")
 
-  cat("Adjusted mean:       ", round(object$mean_adjusted, 6), "\n")
-  cat("Adjusted variance:   ", round(object$var_adjusted, 6), "\n")
-  cat("95% CI (adjusted):   [",
-      round(object$CI_95_adjusted[1], 6), ", ",
-      round(object$CI_95_adjusted[2], 6), "]\n")
-  cat("(Newton-Raphson iterations:", object$iterations, ")\n\n")
+  cat(sprintf("  %-22s %10.6f\n", "Unweighted mean:",     object$mean_unweighted))
+  cat(sprintf("  %-22s %10.6f\n", "Unweighted variance:", object$var_unweighted))
+  cat(sprintf("  %-22s [%10.6f, %10.6f]\n\n",
+              "Unweighted 95% CI:",
+              object$CI_95_unweighted[1],
+              object$CI_95_unweighted[2]))
+
+  cat(sprintf("  %-22s %10.6f\n", "Adjusted mean:",     object$mean_adjusted))
+  cat(sprintf("  %-22s %10.6f\n", "Adjusted variance:", object$var_adjusted))
+  cat(sprintf("  %-22s [%10.6f, %10.6f]\n",
+              "Adjusted 95% CI:",
+              object$CI_95_adjusted[1],
+              object$CI_95_adjusted[2]))
+
+  cat(sprintf("  (Newton–Raphson iterations: %d)\n\n", object$iterations))
+
 
   # --- Coefficients section ---
   if (!is.null(object$coefficients)) {
-    cat("Selection model coefficients:\n\n")
+    cat("Selection model coefficients:\n")
 
     df <- rbind(object$coefficients)
     colnames(df) <- object$variables

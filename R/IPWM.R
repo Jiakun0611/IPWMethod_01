@@ -101,13 +101,14 @@
 #'
 #' @export
 
+
 IPWM <- function(
     sc,                          # sc: convenience sample data.frame
     sp,                          # sp: data.frame (One) or list of data.frames (Multi)
     y,                           # y: outcome variable in sc
     weight,                      # weight: string (One) or vector (Multi)
     p_formula = NULL,            # p_formula: formula (One) or list of formulas (Multi)
-    method = NULL,               # method: one of "ALP", "CLW", "raking" (auto "multi" for list-type sp)
+    method = NULL,               # method: "ALP", "CLW", "raking", or "multi"
     zcol = NULL,                 # zcol: domain variable for subset calculation
     cali = TRUE,                 # cali: whether to run pairwise pre-calibration (Multi only)
     maxit = 20,                  # maxit: maximum Newton–Raphson iterations
@@ -115,81 +116,111 @@ IPWM <- function(
     verbose = FALSE              # verbose: print intermediate updates
 ) {
 
-  # --- 0) Detect single vs. multiple reference samples ---
-  if (is.list(sp) && !is.data.frame(sp) && all(vapply(sp, is.data.frame, logical(1)))) {
+  #--------------------------------------------------------------------------#
+  # 0. Basic input validation
+  #--------------------------------------------------------------------------#
+  check_ipwm_inputs(sc, sp, y, weight, p_formula, method, zcol)
+
+  #--------------------------------------------------------------------------#
+  # 1. Detect single vs. multiple reference cases
+  #--------------------------------------------------------------------------#
+  if (is.list(sp) && all(vapply(sp, is.data.frame, logical(1)))) {
     # Multi-reference case
-    if (is.null(method)) method <- "multi"
-    if (method != "multi") {
-      warning("For list-type 'sp', method forcibly set to 'multi'.")
+    if (is.null(method)) {
+      method <- "multi"
+    } else if (method != "multi") {
+      warning("For list-type 'sp', method forcibly set to 'multi'.", call. = FALSE)
       method <- "multi"
     }
   } else if (is.data.frame(sp)) {
     # One-reference case
     if (is.null(method)) {
-      stop("Please specify method = 'ALP', 'CLW', or 'raking' for one-reference case.")
+      stop("Please specify method = 'ALP', 'CLW', or 'raking' for one-reference case.",
+           call. = FALSE)
     }
   } else {
-    stop("Argument 'sp' must be either a data.frame (one reference) or a list of data.frames (multi reference).")
+    stop("'sp' must be a data.frame (one reference) or a list of data.frames (multi reference).",
+         call. = FALSE)
   }
 
+  #--------------------------------------------------------------------------#
+  # 2. Build (if omitted by user) and preprocess p_formula
+  #--------------------------------------------------------------------------#
+  log_messages <- character(0)
 
-  # --- 0.5) Check and preprocess p_formula ---
+  # Auto-build formula if user did not supply one
+  if (is.null(p_formula)) {
+    built <- p_formula_construction(sc, sp, y, weight, zcol, verbose = verbose)
+    p_formula <- built$p_formula
+    log_messages <- c(log_messages, built$log_messages)
+  }
 
-  if (!is.null(p_formula)) {
+  # Process inputs and optionally run pre-calibration
+  processed <- tryCatch(
+    process_p_formula(sc, sp, weight, y, zcol, p_formula, cali, verbose),
+    error = function(e)
+      stop("Input processing failed: ", e$message, call. = TRUE)
+  )
 
-    # p_formula is restrict to formula type only
-    if (!(inherits(p_formula, "formula") ||
-          (is.list(p_formula) && all(vapply(p_formula, inherits, logical(1), "formula"))))) {
-      stop("'p_formula' must be a formula (for one reference) or a list of formulas (for multiple references).")
-    }
+  sc     <- processed$sc
+  sp     <- processed$sp
+  p_vars <- processed$vars
+  if (!is.null(processed$log_messages)) {
+    log_messages <- c(log_messages, processed$log_messages)
+  }
 
-    processed <- process_p_formula(sc, sp, weight, y, zcol, p_formula)
-    sc     <- processed$sc
-    sp     <- processed$sp
-    p_vars <- processed$vars
+  #--------------------------------------------------------------------------#
+  # 3. Estimation
+  #--------------------------------------------------------------------------#
 
-  } else { p_vars <- p_formula }
-
-
-  # --- 1) Run one-reference IPW method ---
+  # --- One-reference ALP/CLW/Raking ---
   if (method %in% c("ALP", "CLW", "raking")) {
-    result <- IPWM_One(
-      sc      = sc,
-      sp      = sp,
-      y       = y,
-      vars    = p_vars,
-      weight  = weight,
-      method  = method,
-      zcol    = zcol,
-      maxit   = maxit,
-      tol     = tol
+    result <- tryCatch(
+      IPWM_One(
+        sc      = sc,
+        sp      = sp,
+        y       = y,
+        vars    = p_vars,
+        weight  = weight,
+        method  = method,
+        zcol    = zcol,
+        maxit   = maxit,
+        tol     = tol,
+        verbose = verbose,
+        log_messages = log_messages
+      ),
+      error = function(e)
+        stop("Estimation failed in one-reference method: ", e$message, call. = TRUE)
     )
   }
 
-  # --- 2) Run multi-reference Raking method ---
+  # --- Multi-reference Raking ---
   else if (method == "multi") {
-    result <- IPWM_Multi_Raking(
-      sc       = sc,
-      sp       = sp,
-      y        = y,
-      vars     = p_vars,
-      weight   = weight,
-      cali     = cali,
-      zcol     = zcol,
-      maxit    = maxit,
-      tol      = tol,
-      verbose  = verbose
+    result <- tryCatch(
+      IPWM_Multi_Raking(
+        sc        = sc,
+        sp        = sp,
+        y         = y,
+        vars      = p_vars,
+        weight    = weight,
+        cali      = cali,
+        zcol      = zcol,
+        maxit     = maxit,
+        tol       = tol,
+        verbose   = verbose,
+        log_messages    = log_messages
+      ),
+      error = function(e)
+        stop("Estimation failed in multi-reference raking: ", e$message, call. = TRUE)
     )
     result$method <- "multi"
   }
 
-  # --- 3) Invalid method ---
-  else {
-    stop("Unsupported method. Must be one of 'ALP', 'CLW', 'raking', or 'multi'.")
-  }
-
-  # --- 4) Return unified result object ---
+  #--------------------------------------------------------------------------#
+  # 4. Finalize and return
+  #--------------------------------------------------------------------------#
   class(result) <- "IPWM"
   result$call <- match.call()
   return(result)
 }
+

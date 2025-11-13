@@ -56,7 +56,8 @@ PRECALI <- function(wts, refs, dup_vars) {
   ds2_cal <- survey::calibrate(
     design     = ds2,
     formula    = fml,
-    population = pops
+    population = pops,
+    calfun     = "raking"
   )
 
   # --- return new weights ---

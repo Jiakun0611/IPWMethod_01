@@ -6,6 +6,10 @@ unlink("NAMESPACE")  # delete NAMESPACE as roxygen2 will generate new one
 
 usethis::use_r("IPWM")
 devtools::document()
+devtools::load_all(reset = TRUE)
+
+devtools::build()
+
 devtools::check()
 devtools::install(".", force = TRUE)
 
@@ -26,6 +30,6 @@ install.packages("devtools")
 devtools::install_github("Jiakun0611/IPWMethod")
 
 
-remove.packages("IPWMethod")
+remove.packages("IPWMethod") # better to restart R session
 
 browseURL(system.file("Doc", "formula_cheatsheet.pdf", package = "IPWMethod"))

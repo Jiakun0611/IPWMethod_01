@@ -8,12 +8,12 @@
 IPWM_Multi_Raking <- function(
     sc, sp, y, vars = list(), weight,
     cali = TRUE, zcol = NULL,
-    maxit = 20, tol = 1e-4, verbose = FALSE) {
+    maxit = 20, tol = 1e-4, verbose = FALSE, log_messages) {
 
   result_naive <- naive_mean(df=sc, domain_var = zcol, y=y)
 
   # initialize log
-  log_messages <- character()
+  log_messages <- log_messages
 
   # --- 1) Reorder by size ---
   sorted        <- sort_by_sp_size(sp, vars, weight, verbose = verbose)
@@ -91,7 +91,7 @@ IPWM_Multi_Raking <- function(
     iterations       = nr_out$iter,
     method           = "multi",
     call             = match.call(),
-    log              = log_messages
+    log_messages     = log_messages
   )
 
 
